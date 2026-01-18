@@ -1,0 +1,157 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+
+    /* Titres */
+    .title-section {
+        @apply text-3xl font-bold text-brand-dark mb-4;
+    }
+
+    .subtitle {
+        @apply text-sm italic text-gray-500 mb-1;
+    }
+
+    /* Boutons */
+    .btn-primary {
+        @apply bg-brand-green text-white px-6 py-2 rounded-full font-semibold transition hover:bg-green-700 text-sm inline-block;
+    }
+
+    .btn-outline {
+        @apply border border-brand-green text-brand-green px-8 py-2 rounded-full font-medium transition hover:bg-brand-green hover:text-white text-sm;
+    }
+
+    /* Cartes (Raids et Courses) */
+    .card-event {
+        @apply bg-white shadow-sm rounded-sm overflow-hidden border border-gray-100 p-3;
+    }
+
+
+    .admin-table-container {
+        @apply bg-white border border-gray-200 rounded-lg shadow-sm p-6;
+    }
+
+
+    /* Structure du tableau */
+    .admin-table {
+        @apply w-full text-left border-collapse;
+    }
+
+    .admin-table th {
+        @apply uppercase text-xs font-bold text-gray-500 tracking-wider py-4 px-3 border-b border-gray-200;
+    }
+
+    .admin-table td {
+        @apply py-3 px-3 text-sm border-b border-gray-100 align-middle;
+    }
+
+    /* Lignes d'équipe (fond vert très léger) */
+    .row-team {
+        @apply bg-green-50/30 font-bold text-gray-800;
+    }
+
+    /* Lignes de participants (décalage) */
+    .row-participant {
+        @apply text-gray-600;
+    }
+
+    .participant-indent {
+        @apply pl-6 text-gray-400 font-light;
+    }
+
+    /* Badges de statut */
+    .badge-status {
+        @apply px-2 py-1 rounded text-[11px] font-bold uppercase;
+    }
+
+    .badge-success {
+        @apply bg-transparent text-green-700;
+    }
+
+    .badge-warning {
+        @apply bg-yellow-100 text-yellow-700;
+    }
+
+    /* Boutons spécifiques */
+    .btn-table-action {
+        @apply border-2 border-green-600 text-green-600 px-4 py-1.5 rounded-md text-sm font-bold hover:bg-green-600 hover:text-white transition-colors;
+    }
+
+    .btn-table-done {
+        @apply bg-green-700 text-white px-4 py-1.5 rounded-md text-sm font-bold;
+    }
+
+    /* Champs de saisie du formulaire */
+    .form-input {
+        @apply w-full border border-gray-300 rounded-md py-2 px-3 text-sm text-gray-800 transition-all focus:outline-none focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green bg-white;
+    }
+
+    .form-label {
+        @apply block text-xs font-bold uppercase text-gray-500 mb-1 tracking-wide;
+    }
+
+    /* Conteneur de groupe (Fieldset stylisé) */
+    .form-section-container {
+        @apply bg-white border border-gray-200 rounded-lg p-6 shadow-sm mb-6;
+    }
+
+    .form-section-title {
+        @apply text-lg font-bold text-brand-dark mb-4 border-b border-gray-100 pb-2 flex items-center gap-2;
+    }
+
+    /* Conteneur principal */
+    .video-section {
+        position: relative;
+        width: 100%;
+        height: 100vh;
+        /* Toute la hauteur de l'écran */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        background-color: #000;
+        /* Fond noir par défaut */
+    }
+
+    /* Vidéo en arrière-plan */
+    .bg-video {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        min-width: 100%;
+        min-height: 100%;
+        width: auto;
+        height: auto;
+        z-index: 0;
+        transform: translate(-50%, -50%);
+        object-fit: cover;
+        /* Remplit l'espace sans déformer */
+    }
+
+    /* Couche sombre (Overlay) */
+    .video-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.4);
+        /* Noir à 40% d'opacité */
+        z-index: 1;
+    }
+
+    /* Contenu texte */
+    .video-content {
+        position: relative;
+        z-index: 2;
+        color: #ffffff;
+        text-align: center;
+        font-family: sans-serif;
+    }
+
+    .video-content h1 {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+}
