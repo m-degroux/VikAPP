@@ -29,7 +29,7 @@ Do not push secret files (like `.env`) to the repository.
 
 ## Quick start (Linux)
 1. Clone repository:
-   git clone <repo-url> && cd groupe5
+   git clone <repo-url> && cd VikAPP
 2. Install PHP dependencies:
    cd laravel
    composer install
