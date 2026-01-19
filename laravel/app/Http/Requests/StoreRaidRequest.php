@@ -10,7 +10,8 @@ class StoreRaidRequest extends FormRequest
     public function authorize(): bool
     {
         $raidId = $this->route('raid');
-        return true;//Gate::allows('raid', $raidId);
+
+        return true; // Gate::allows('raid', $raidId);
     }
 
     public function rules(): array
@@ -25,7 +26,10 @@ class StoreRaidRequest extends FormRequest
             'raid_website' => 'nullable|string|max:50|url',
             'raid_place' => 'nullable|string|max:50',
             'raid_picture' => 'nullable|string|max:128',
-            'responsible_id' => 'required|exists:vik_member,user_id',
+            'raid_lat' => 'nullable|numeric',
+            'raid_lng' => 'nullable|numeric',
+            'club_id' => 'nullable|exists:vik_club,club_id',
+            'responsible_id' => 'nullable|exists:vik_member,user_id',
         ];
     }
 

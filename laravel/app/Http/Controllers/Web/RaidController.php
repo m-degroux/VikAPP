@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Web;
 
+use App\Actions\Raid\CreateRaid;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreRaidRequest;
 use App\Services\GeocodingService;
@@ -9,7 +10,7 @@ use App\Services\RaidService;
 use Illuminate\Http\Request;
 
 /**
- * Controller responsible for managing Raids, including searching, 
+ * Controller responsible for managing Raids, including searching,
  * displaying details, and geocoding-based creation.
  */
 class RaidController extends Controller
@@ -20,13 +21,17 @@ class RaidController extends Controller
     /** @var GeocodingService Handling address to coordinate transformation */
     protected $geocoder;
 
+    /** @var CreateRaid Handling raid creation logic */
+    protected $createRaidAction;
+
     /**
      * Dependency injection via constructor.
      */
-    public function __construct(RaidService $raidService, GeocodingService $geocoder)
+    public function __construct(RaidService $raidService, GeocodingService $geocoder, CreateRaid $createRaidAction)
     {
         $this->raidService = $raidService;
         $this->geocoder = $geocoder;
+        $this->createRaidAction = $createRaidAction;
     }
 
     /**
@@ -37,7 +42,7 @@ class RaidController extends Controller
         $filters = $request->all();
 
         // If a location name is provided but coordinates are missing, fetch them
-        if (!empty($filters['location']) && (empty($filters['lat']) || empty($filters['lon']))) {
+        if (! empty($filters['location']) && (empty($filters['lat']) || empty($filters['lon']))) {
 
             $coords = $this->geocoder->getCoordinates($filters['location']);
 
@@ -49,7 +54,7 @@ class RaidController extends Controller
                 // Merge coordinates back into the request for persistent filtering
                 $request->merge([
                     'lat' => $filters['lat'],
-                    'lon' => $filters['lon']
+                    'lon' => $filters['lon'],
                 ]);
             }
         }
@@ -57,7 +62,7 @@ class RaidController extends Controller
         // Delegate the complex search logic to the RaidService
         $raids = $this->raidService->searchRaids($filters);
 
-        return view('raid.index', compact('raids'));
+        return view('public.raids.index', compact('raids'));
     }
 
     /**
@@ -66,24 +71,24 @@ class RaidController extends Controller
     public function show(string $id)
     {
         $raid = $this->raidService->getRaidById($id);
-        
+
         // Eager load related races, their teams, and specific age categories
         $raid->load('races.teams', 'races.ageCategories');
 
-        return view('raid.show', compact('raid'));
+        return view('public.raids.show', compact('raid'));
     }
 
     /**
      * Store a newly created raid in the database.
      */
-    public function store(StoreRaidRequest $request, GeocodingService $geocoder, RaidService $raidService)
+    public function store(StoreRaidRequest $request)
     {
         // Get data validated via the dedicated StoreRaidRequest class
         $validated = $request->validated();
 
         // Attempt to geocode the raid's location to store precise coordinates
-        if (!empty($validated['RAID_PLACE'])) {
-            $coords = $geocoder->getCoordinates($validated['RAID_PLACE']);
+        if (! empty($validated['RAID_PLACE'])) {
+            $coords = $this->geocoder->getCoordinates($validated['RAID_PLACE']);
             if ($coords) {
                 $validated['RAID_LAT'] = $coords['lat'];
                 $validated['RAID_LNG'] = $coords['lng'];
@@ -93,15 +98,20 @@ class RaidController extends Controller
         try {
             // Get the ID of the member responsible for the raid
             $responsibleId = $request->input('responsible_id');
-            
-            // Persist the raid and its association with the responsible person
-            $raid = $this->raidService->createRaid($validated, $responsibleId);
 
-            return redirect()->route('raid.show', $raid->raid_id)
-                ->with('success', 'Le raid et son responsable ont été créés avec succès !');
+            // Persist the raid and its association with the responsible person
+            $raid = $this->createRaidAction->execute($validated, $responsibleId);
+
+            if (!$raid || !$raid->raid_id) {
+                throw new \Exception('Le raid n\'a pas pu être créé correctement.');
+            }
+
+            return redirect()->route('raid.show', ['raid' => $raid->raid_id])
+                ->with('success', 'Le raid "' . $raid->raid_name . '" a été créé avec succès !');
 
         } catch (\Exception $e) {
             // Rollback and return with input data and error message in case of failure
+            \Log::error('Erreur création raid: ' . $e->getMessage());
             return back()->withInput()->withErrors(['error' => $e->getMessage()]);
         }
     }

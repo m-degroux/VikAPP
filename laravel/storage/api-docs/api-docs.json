@@ -1,0 +1,1176 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "VIKAPP API",
+    "description": "Viking Raids Management System - Complete REST API for managing trail running events, races, teams and participants",
+    "version": "1.0.0",
+    "contact": {
+      "email": "contact@vikapp.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000/api",
+      "description": "Local Development Server"
+    },
+    {
+      "url": "https://api.vikapp.com",
+      "description": "Production Server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Authentication",
+      "description": "User authentication and account management"
+    },
+    {
+      "name": "Raids",
+      "description": "Raid event management operations"
+    },
+    {
+      "name": "Races",
+      "description": "Race management within raids"
+    },
+    {
+      "name": "Teams",
+      "description": "Team registration and management"
+    },
+    {
+      "name": "Clubs",
+      "description": "Sports club management"
+    }
+  ],
+  "paths": {
+    "/login": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Login user",
+        "description": "Authenticate a user and return access token",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["username", "password"],
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "example": "testuser"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "password"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful login",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "access_token": {
+                      "type": "string",
+                      "example": "1|abc123def456..."
+                    },
+                    "token_type": {
+                      "type": "string",
+                      "example": "Bearer"
+                    },
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "example": 42
+                        },
+                        "name": {
+                          "type": "string",
+                          "example": "Doe"
+                        },
+                        "firstname": {
+                          "type": "string",
+                          "example": "John"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials"
+          }
+        }
+      }
+    },
+    "/register": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Register new user",
+        "description": "Create a new member account and return access token",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "access_token": {
+                      "type": "string"
+                    },
+                    "user": {
+                      "$ref": "#/components/schemas/Member"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error"
+          }
+        }
+      }
+    },
+    "/logout": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Logout user",
+        "description": "Revoke all user's authentication tokens",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Logged out successfully"
+          },
+          "401": {
+            "description": "Unauthenticated"
+          }
+        }
+      }
+    },
+    "/user": {
+      "get": {
+        "tags": ["Authentication"],
+        "summary": "Get current user",
+        "description": "Get authenticated user profile",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Member"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Authentication"],
+        "summary": "Update profile",
+        "description": "Update authenticated user's profile",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProfileRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Profile updated"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Authentication"],
+        "summary": "Delete account",
+        "description": "Permanently delete user account",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Account deleted"
+          }
+        }
+      }
+    },
+    "/raids": {
+      "get": {
+        "tags": ["Raids"],
+        "summary": "List all raids",
+        "description": "Get paginated list of raids with filtering",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "default": 15
+            }
+          },
+          {
+            "name": "upcoming",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Raid"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Raids"],
+        "summary": "Create raid",
+        "description": "Create a new raid event",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRaidRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Raid created"
+          },
+          "422": {
+            "description": "Validation error"
+          }
+        }
+      }
+    },
+    "/raids/{id}": {
+      "get": {
+        "tags": ["Raids"],
+        "summary": "Get raid by ID",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Raid"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Raid not found"
+          }
+        }
+      },
+      "put": {
+        "tags": ["Raids"],
+        "summary": "Update raid",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRaidRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Raid updated"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Raids"],
+        "summary": "Delete raid",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Raid deleted"
+          }
+        }
+      }
+    },
+    "/races": {
+      "get": {
+        "tags": ["Races"],
+        "summary": "List all races",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "raid_id",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "upcoming",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Race"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Races"],
+        "summary": "Create race",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRaceRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Race created"
+          }
+        }
+      }
+    },
+    "/races/{id}": {
+      "get": {
+        "tags": ["Races"],
+        "summary": "Get race by ID",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Race"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Races"],
+        "summary": "Update race",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRaceRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Race updated"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Races"],
+        "summary": "Delete race",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Race deleted"
+          }
+        }
+      }
+    },
+    "/teams": {
+      "get": {
+        "tags": ["Teams"],
+        "summary": "List all teams",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "race_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Teams"],
+        "summary": "Create team",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTeamRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Team created"
+          }
+        }
+      }
+    },
+    "/clubs": {
+      "get": {
+        "tags": ["Clubs"],
+        "summary": "List all clubs",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Club"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Clubs"],
+        "summary": "Create club",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateClubRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Club created"
+          }
+        }
+      }
+    },
+    "/clubs/{id}": {
+      "get": {
+        "tags": ["Clubs"],
+        "summary": "Get club by ID",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "put": {
+        "tags": ["Clubs"],
+        "summary": "Update club",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Club updated"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Clubs"],
+        "summary": "Delete club",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Club deleted"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "Member": {
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "integer",
+            "example": 42
+          },
+          "user_username": {
+            "type": "string",
+            "example": "john_doe"
+          },
+          "mem_firstname": {
+            "type": "string",
+            "example": "John"
+          },
+          "mem_name": {
+            "type": "string",
+            "example": "Doe"
+          },
+          "mem_sex": {
+            "type": "string",
+            "enum": ["M", "F"],
+            "example": "M"
+          },
+          "mem_size": {
+            "type": "integer",
+            "example": 180
+          },
+          "mem_weight": {
+            "type": "number",
+            "format": "float",
+            "example": 75.5
+          },
+          "mem_birth_year": {
+            "type": "integer",
+            "example": 1990
+          },
+          "mem_mail": {
+            "type": "string",
+            "format": "email",
+            "example": "john@example.com"
+          },
+          "mem_phone": {
+            "type": "string",
+            "example": "+33612345678"
+          }
+        }
+      },
+      "Raid": {
+        "type": "object",
+        "properties": {
+          "raid_id": {
+            "type": "integer",
+            "example": 1
+          },
+          "raid_name": {
+            "type": "string",
+            "example": "Viking Trail 2026"
+          },
+          "raid_description": {
+            "type": "string"
+          },
+          "raid_start_date": {
+            "type": "string",
+            "format": "date",
+            "example": "2026-06-15"
+          },
+          "raid_location": {
+            "type": "string",
+            "example": "Chamonix"
+          },
+          "raid_gps_lat": {
+            "type": "number",
+            "format": "float"
+          },
+          "raid_gps_long": {
+            "type": "number",
+            "format": "float"
+          },
+          "type_id": {
+            "type": "integer"
+          },
+          "diff_id": {
+            "type": "integer"
+          },
+          "club_id": {
+            "type": "integer"
+          }
+        }
+      },
+      "Race": {
+        "type": "object",
+        "properties": {
+          "race_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "race_name": {
+            "type": "string",
+            "example": "Trail 20km"
+          },
+          "race_length": {
+            "type": "number",
+            "format": "float",
+            "example": 20.5
+          },
+          "race_start_date": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "race_max_num_runner": {
+            "type": "integer"
+          },
+          "race_price": {
+            "type": "number",
+            "format": "float"
+          },
+          "raid_id": {
+            "type": "integer"
+          }
+        }
+      },
+      "Team": {
+        "type": "object",
+        "properties": {
+          "team_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "team_name": {
+            "type": "string"
+          },
+          "team_point": {
+            "type": "integer"
+          },
+          "race_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "club_id": {
+            "type": "integer"
+          }
+        }
+      },
+      "Club": {
+        "type": "object",
+        "properties": {
+          "club_id": {
+            "type": "integer"
+          },
+          "club_name": {
+            "type": "string"
+          },
+          "club_address": {
+            "type": "string"
+          },
+          "club_mail": {
+            "type": "string",
+            "format": "email"
+          },
+          "club_phone": {
+            "type": "string"
+          }
+        }
+      },
+      "RegisterRequest": {
+        "type": "object",
+        "required": [
+          "user_username",
+          "user_password",
+          "user_password_confirmation",
+          "mem_firstname",
+          "mem_name",
+          "mem_sex",
+          "mem_size",
+          "mem_weight",
+          "mem_birth_year",
+          "mem_mail"
+        ],
+        "properties": {
+          "user_username": {
+            "type": "string"
+          },
+          "user_password": {
+            "type": "string",
+            "format": "password"
+          },
+          "user_password_confirmation": {
+            "type": "string",
+            "format": "password"
+          },
+          "mem_firstname": {
+            "type": "string"
+          },
+          "mem_name": {
+            "type": "string"
+          },
+          "mem_sex": {
+            "type": "string",
+            "enum": ["M", "F"]
+          },
+          "mem_size": {
+            "type": "integer"
+          },
+          "mem_weight": {
+            "type": "number"
+          },
+          "mem_birth_year": {
+            "type": "integer"
+          },
+          "mem_mail": {
+            "type": "string",
+            "format": "email"
+          },
+          "mem_phone": {
+            "type": "string"
+          }
+        }
+      },
+      "UpdateProfileRequest": {
+        "type": "object",
+        "properties": {
+          "mem_firstname": {
+            "type": "string"
+          },
+          "mem_name": {
+            "type": "string"
+          },
+          "mem_mail": {
+            "type": "string",
+            "format": "email"
+          },
+          "mem_phone": {
+            "type": "string"
+          },
+          "mem_size": {
+            "type": "integer"
+          },
+          "mem_weight": {
+            "type": "number"
+          }
+        }
+      },
+      "CreateRaidRequest": {
+        "type": "object",
+        "required": [
+          "raid_name",
+          "raid_start_date",
+          "raid_location",
+          "type_id",
+          "diff_id",
+          "club_id"
+        ],
+        "properties": {
+          "raid_name": {
+            "type": "string"
+          },
+          "raid_description": {
+            "type": "string"
+          },
+          "raid_start_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "raid_location": {
+            "type": "string"
+          },
+          "raid_address": {
+            "type": "string"
+          },
+          "raid_gps_lat": {
+            "type": "number"
+          },
+          "raid_gps_long": {
+            "type": "number"
+          },
+          "type_id": {
+            "type": "integer"
+          },
+          "diff_id": {
+            "type": "integer"
+          },
+          "club_id": {
+            "type": "integer"
+          }
+        }
+      },
+      "UpdateRaidRequest": {
+        "type": "object",
+        "properties": {
+          "raid_name": {
+            "type": "string"
+          },
+          "raid_description": {
+            "type": "string"
+          },
+          "raid_start_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "raid_location": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateRaceRequest": {
+        "type": "object",
+        "required": [
+          "race_name",
+          "race_start_date",
+          "race_length",
+          "race_max_num_runner",
+          "raid_id",
+          "type_id",
+          "diff_id"
+        ],
+        "properties": {
+          "race_name": {
+            "type": "string"
+          },
+          "race_start_date": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "race_length": {
+            "type": "number"
+          },
+          "race_max_num_runner": {
+            "type": "integer"
+          },
+          "race_price": {
+            "type": "number"
+          },
+          "raid_id": {
+            "type": "integer"
+          },
+          "type_id": {
+            "type": "integer"
+          },
+          "diff_id": {
+            "type": "integer"
+          }
+        }
+      },
+      "UpdateRaceRequest": {
+        "type": "object",
+        "properties": {
+          "race_name": {
+            "type": "string"
+          },
+          "race_price": {
+            "type": "number"
+          }
+        }
+      },
+      "CreateTeamRequest": {
+        "type": "object",
+        "required": ["team_name", "race_id"],
+        "properties": {
+          "team_name": {
+            "type": "string"
+          },
+          "race_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "club_id": {
+            "type": "integer"
+          }
+        }
+      },
+      "CreateClubRequest": {
+        "type": "object",
+        "required": ["club_name", "club_address"],
+        "properties": {
+          "club_name": {
+            "type": "string"
+          },
+          "club_address": {
+            "type": "string"
+          },
+          "club_mail": {
+            "type": "string",
+            "format": "email"
+          },
+          "club_phone": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

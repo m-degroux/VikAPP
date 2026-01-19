@@ -18,7 +18,7 @@ class UpdateProfileRequest extends FormRequest
         return [
             'mem_name' => 'sometimes|required|string|max:50',
             'mem_firstname' => 'sometimes|required|string|max:50',
-            'mem_email' => 'sometimes|required|email|unique:vik_member,mem_email,' . $userId . ',user_id',
+            'mem_email' => 'sometimes|required|email|unique:vik_member,mem_email,'.$userId.',user_id',
             'mem_phone' => 'sometimes|required|string|size:10',
             'mem_adress' => 'sometimes|required|string|max:128',
             'user_password' => 'sometimes|nullable|string|min:8|confirmed',

@@ -4,28 +4,34 @@ namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Services\ProfileService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
-use App\Models\Club;
 
 /**
  * Controller handled to manage user profile actions: viewing, updating, and deleting.
  */
 class ProfileController extends Controller
 {
+    protected $profileService;
+
+    public function __construct(ProfileService $profileService)
+    {
+        $this->profileService = $profileService;
+    }
+
     /**
      * Display the user's profile form.
      */
     public function edit(Request $request): View
     {
         // Return the profile view with the authenticated user and the list of all clubs
-        return view('pages.profile', [
-            'user' => $request->user(),
-            'clubs' => Club::all()
-        ]);
+        $data = $this->profileService->getUserProfile($request->user());
+
+        return view('pages.profile', $data);
     }
 
     /**

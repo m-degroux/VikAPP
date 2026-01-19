@@ -6,13 +6,10 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('vik_age_category', function (Blueprint $table) {
-            $table->id('age_id')->primary();
+            $table->string('age_id')->primary();
             $table->unsignedTinyInteger('age_min')->nullable();
             $table->unsignedTinyInteger('age_max')->nullable();
         });

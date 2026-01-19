@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Models\Raid;
 use App\Services\GeocodingService;
+use Illuminate\Console\Command;
 
 class GeocodeRaids extends Command
 {
@@ -24,14 +24,15 @@ class GeocodeRaids extends Command
     public function handle(GeocodingService $geocoder)
     {
         $raids = Raid::whereNotNull('raid_place')
-            ->where(function($query) {
+            ->where(function ($query) {
                 $query->whereNull('raid_lat')
                     ->orWhereNull('raid_lng');
             })
             ->get();
 
         if ($raids->isEmpty()) {
-            $this->info("Aucun raid à géocoder.");
+            $this->info('Aucun raid à géocoder.');
+
             return;
         }
 
@@ -45,9 +46,9 @@ class GeocodeRaids extends Command
             if ($coords) {
                 $raid->update([
                     'raid_lat' => $coords['lat'],
-                    'raid_lng' => $coords['lng']
+                    'raid_lng' => $coords['lng'],
                 ]);
-                $this->info("✅ Succès !");
+                $this->info('✅ Succès !');
             } else {
                 $this->error("❌ Impossible de trouver les coordonnées pour l'adresse : {$raid->raid_place}");
             }
@@ -55,6 +56,6 @@ class GeocodeRaids extends Command
             usleep(200000);
         }
 
-        $this->info("Opération terminée.");
+        $this->info('Opération terminée.');
     }
 }

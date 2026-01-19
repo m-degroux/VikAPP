@@ -10,7 +10,7 @@ class GeocodingService
     {
         $response = Http::get('https://api-adresse.data.gouv.fr/search/', [
             'q' => $address,
-            'limit' => 1
+            'limit' => 1,
         ]);
 
         if ($response->successful() && count($response->json('features')) > 0) {
@@ -19,7 +19,7 @@ class GeocodingService
 
             return [
                 'lat' => $coordinates[1],
-                'lng' => $coordinates[0]
+                'lng' => $coordinates[0],
             ];
         }
 

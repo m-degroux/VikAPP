@@ -6,18 +6,16 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('vik_join_team', function (Blueprint $table) {
-            $table->id('team_id');
-            $table->foreignId('user_id')->constrained('vik_member', 'user_id');
+            $table->string('team_id');
+            $table->unsignedBigInteger('user_id');
 
             $table->primary(['team_id', 'user_id']);
+            $table->foreign('team_id')->references('team_id')->on('vik_team');
+            $table->foreign('user_id')->references('user_id')->on('vik_member');
         });
-
     }
 
     /**

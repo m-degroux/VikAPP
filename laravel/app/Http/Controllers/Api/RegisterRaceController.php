@@ -3,23 +3,24 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Services\RaceService;
+use App\Services\RaceRegistrationService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Request;
 
 class RegisterRaceController extends Controller
 {
-    protected $raceService;
+    protected RaceRegistrationService $raceRegistrationService;
 
-    public function __construct(RaceService $raceService)
+    public function __construct(RaceRegistrationService $raceRegistrationService)
     {
-        $this->raceService = $raceService;
+        $this->raceRegistrationService = $raceRegistrationService;
     }
 
     /**
      * Register to a race
      */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
             'race_id' => 'required|integer',
@@ -31,10 +32,11 @@ class RegisterRaceController extends Controller
         $validated['user_id'] = Auth::id();
 
         try {
-            $this->raceService->registerToRace($validated);
-            return redirect()->route('dashboard')->with('success', 'Inscription à la course réussie !');
+            $this->raceRegistrationService->registerToRace($validated);
+
+            return response()->json(['message' => 'Inscription à la course réussie !'], 201);
         } catch (\Exception $e) {
-            return back()->with('error', 'Erreur lors de l\'inscription (doublon ou problème technique).');
+            return response()->json(['error' => 'Erreur lors de l\'inscription (doublon ou problème technique).'], 500);
         }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Auth;
 
-use App\Models\User;
+use App\Models\Member;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -19,36 +19,36 @@ class AuthenticationTest extends TestCase
 
     public function test_users_can_authenticate_using_the_login_screen(): void
     {
-        $user = User::factory()->create();
+        $member = Member::factory()->create();
 
         $response = $this->post('/login', [
-            'email' => $user->email,
+            'username' => $member->user_username,
             'password' => 'password',
         ]);
 
-        $this->assertAuthenticated();
-        $response->assertRedirect(route('dashboard', absolute: false));
+        $this->assertAuthenticated('web');
+        $response->assertRedirect(route('welcome', absolute: false));
     }
 
     public function test_users_can_not_authenticate_with_invalid_password(): void
     {
-        $user = User::factory()->create();
+        $member = Member::factory()->create();
 
         $this->post('/login', [
-            'email' => $user->email,
+            'username' => $member->user_username,
             'password' => 'wrong-password',
         ]);
 
-        $this->assertGuest();
+        $this->assertGuest('web');
     }
 
     public function test_users_can_logout(): void
     {
-        $user = User::factory()->create();
+        $member = Member::factory()->create();
 
-        $response = $this->actingAs($user)->post('/logout');
+        $response = $this->actingAs($member)->post('/logout');
 
-        $this->assertGuest();
+        $this->assertGuest('web');
         $response->assertRedirect('/');
     }
 }

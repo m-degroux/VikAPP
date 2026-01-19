@@ -6,22 +6,21 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('vik_team', function (Blueprint $table) {
-            $table->id('team_id')->primary();
-            $table->foreignId('race_id')->constrained('vik_race', 'race_id');
-            $table->foreignId('user_id')->constrained('vik_member', 'user_id');
+            $table->string('team_id')->primary();
+            $table->string('race_id');
+            $table->unsignedBigInteger('user_id');
 
             $table->string('team_name', 50);
             $table->string('team_picture', 128)->nullable();
             $table->time('team_time')->nullable();
             $table->unsignedSmallInteger('team_point')->nullable();
-        });
 
+            $table->foreign('race_id')->references('race_id')->on('vik_race');
+            $table->foreign('user_id')->references('user_id')->on('vik_member');
+        });
     }
 
     /**

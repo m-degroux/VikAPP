@@ -12,7 +12,7 @@ class AuthService
     {
         $member = Member::where('user_username', $username)->first();
 
-        if (!$member || !Hash::check($password, $member->user_password)) {
+        if (! $member || ! Hash::check($password, $member->user_password)) {
             throw ValidationException::withMessages([
                 'username' => ['Identifiants incorrects.'],
             ]);
@@ -22,7 +22,7 @@ class AuthService
 
         return [
             'token' => $token,
-            'user' => $member
+            'user' => $member,
         ];
     }
 
@@ -35,19 +35,20 @@ class AuthService
 
         return [
             'token' => $token,
-            'user' => $member
+            'user' => $member,
         ];
     }
 
     public function updateProfile(Member $member, array $data): Member
     {
-        if (!empty($data['user_password'])) {
+        if (! empty($data['user_password'])) {
             $data['user_password'] = Hash::make($data['user_password']);
         } else {
             unset($data['user_password']);
         }
 
         $member->update($data);
+
         return $member;
     }
 }

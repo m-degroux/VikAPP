@@ -6,13 +6,10 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('vik_member', function (Blueprint $table) {
-            $table->id('user_id')->primary();
+            $table->id('user_id');
             $table->unsignedBigInteger('club_id')->nullable();
 
             $table->string('mem_name', 50);
@@ -26,7 +23,6 @@ return new class extends Migration
             $table->string('user_username', 50);
             $table->string('user_password', 255);
         });
-
     }
 
     /**

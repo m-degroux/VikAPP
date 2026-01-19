@@ -28,6 +28,6 @@ class WelcomeController extends Controller
             ->get();
 
         // Return the welcome view with the filtered raids data
-        return view('welcome', compact('nextRaids'));
+        return view('public.home', compact('nextRaids'));
     }
 }

@@ -17,7 +17,7 @@ class Member extends Authenticatable
     /* ------------------------------------------------------
      * ELOQUENT CONFIGURATION
      * ------------------------------------------------------ */
-    
+
     /** @var string The table associated with the model */
     protected $table = 'vik_member';
 
@@ -42,7 +42,7 @@ class Member extends Authenticatable
         'mem_email',
         'mem_default_licence',
         'user_username',
-        'user_password'
+        'user_password',
     ];
 
     /** @var array The attributes that should be hidden for serialization */
@@ -50,6 +50,14 @@ class Member extends Authenticatable
         'user_password',
         'remember_token',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'mem_birthdate' => 'date',
+            'mem_email' => 'string',
+        ];
+    }
 
     /* ------------------------------------------------------
      * 1. MEMBERSHIP RELATIONS (Entities I belong to)
@@ -76,11 +84,11 @@ class Member extends Authenticatable
             'user_id',
             'race_id'
         )->withPivot([
-                    'jrace_licence_num',
-                    'jrace_pps',
-                    'jrace_presence_valid',
-                    'jrace_payement_valid'
-                ]);
+            'jrace_licence_num',
+            'jrace_pps',
+            'jrace_presence_valid',
+            'jrace_payement_valid',
+        ]);
     }
 
     /**
@@ -118,8 +126,7 @@ class Member extends Authenticatable
      */
     public function managedRaids()
     {
-        return $this->belongsToMany(Raid::class, 'vik_manage_raid', 'user_id', 'raid_id')
-            ->where('raid_end_date', '>', now());
+        return $this->belongsToMany(Raid::class, 'vik_manage_raid', 'user_id', 'raid_id');
     }
 
     /**
@@ -135,45 +142,11 @@ class Member extends Authenticatable
      * ------------------------------------------------------ */
 
     /**
-     * Check if the member manages at least one active club.
+     * Check if the member is a club manager.
      */
     public function isClubManager(): bool
     {
         return $this->managedClub()->exists();
-    }
-
-    /**
-     * Check if the member has created/managed at least one team.
-     */
-    public function isTeamManager(): bool
-    {
-        return $this->managedTeams()->exists();
-    }
-
-    /**
-     * Check if the member is an organizer for any upcoming raids.
-     */
-    public function isRaidOrganizer(): bool
-    {
-        return $this->managedRaids()->exists();
-    }
-
-    /**
-     * Check if the member is assigned as a manager for any races.
-     */
-    public function isRaceManager(): bool
-    {
-        return $this->managedRaces()->exists();
-    }
-
-    /**
-     * Retrieve the specific club ID managed by a user.
-     */
-    public function clubId(int $user_id): int
-    {
-        $club = Club::select('club_id')->where('user_id', $user_id)->first();
-
-        return $club->club_id;
     }
 
     /* ------------------------------------------------------

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\JoinTeam;
 use Illuminate\Support\Facades\DB;
 
 class TeamService
@@ -13,5 +14,9 @@ class TeamService
             ['user_id' => $userId, 'team_id' => $teamId]
         );
     }
-}
 
+    public function removeMemberFromTeam(int $userId, int $teamId)
+    {
+        return JoinTeam::where('user_id', $userId)->where('team_id', $teamId)->delete();
+    }
+}

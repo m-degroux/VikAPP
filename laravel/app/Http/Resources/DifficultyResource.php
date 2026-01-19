@@ -16,7 +16,7 @@ class DifficultyResource extends JsonResource
             'distance' => [
                 'min' => $this->dif_dist_min,
                 'max' => $this->dif_dist_max,
-                'label' => $this->dif_dist_min . ' - ' . $this->dif_dist_max . ' km',
+                'label' => $this->dif_dist_min.' - '.$this->dif_dist_max.' km',
             ],
         ];
     }

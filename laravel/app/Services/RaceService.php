@@ -8,7 +8,7 @@ class RaceService
 {
     public function getAll()
     {
-        return Race::all();
+        return Race::with('raid')->get();
     }
 
     public function create(array $data)
@@ -26,24 +26,20 @@ class RaceService
         $race = Race::find($id);
         if ($race) {
             $race->update($data);
+
             return $race;
         }
+
         return null;
     }
 
-    /**
-     * register a user to a race
-     */
-    public function registerToRace(array $data)
+    public function delete($id): bool
     {
-        return DB::table('vik_join_race')->insert([
-            'user_id' => $data['user_id'],
-            'race_id' => $data['race_id'],
-            'team_id' => $data['team_id'],
-            'jrace_licence_num' => $data['jrace_licence_num'] ?? null,
-            'jrace_pps' => $data['jrace_pps'] ?? null,
-            'jrace_presence_valid' => false,
-            'jrace_payement_valid' => false,
-        ]);
+        $race = Race::find($id);
+        if ($race) {
+            return (bool) $race->delete();
+        }
+
+        return false;
     }
 }

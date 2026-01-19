@@ -5,6 +5,7 @@ namespace App\Http\Requests\Auth;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -27,8 +28,8 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user_username' => ['required', 'string'],
-            'user_password' => ['required', 'string'],
+            'username' => ['required', 'string'],
+            'password' => ['required', 'string'],
         ];
     }
 
@@ -37,38 +38,37 @@ class LoginRequest extends FormRequest
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-
     public function authenticate(): void
     {
         $this->ensureIsNotRateLimited();
 
-        // Laravel use the array key password
-
         $credentials = [
-            'user_username' => $this->user_username,
-            'password' => $this->user_password,
+            'user_username' => $this->username,
+            'password' => $this->password,
         ];
 
-        //is the user a member ?
-        if (Auth::guard('web')->attempt($credentials)) {
+        Log::debug('Attempting authentication with credentials:', $credentials);
+        if (Auth::guard('web')->attempt($credentials, $this->boolean('remember'))) {
+            Log::debug('Web guard authentication successful.');
             RateLimiter::clear($this->throttleKey());
+
             return;
         }
 
-        //is the user an admin ?
-        if (Auth::guard('admin')->attempt($credentials)) {
+        if (Auth::guard('admin')->attempt($credentials, $this->boolean('remember'))) {
+            Log::debug('Admin guard authentication successful.');
             RateLimiter::clear($this->throttleKey());
+
             return;
         }
+        Log::debug('Authentication failed for both guards.');
 
-        //no accounts found
         RateLimiter::hit($this->throttleKey());
 
         throw ValidationException::withMessages([
-            'user_username' => trans('auth.failed'),
+            'username' => trans('auth.failed'),
         ]);
     }
-
 
     /**
      * Ensure the login request is not rate limited.
@@ -77,7 +77,7 @@ class LoginRequest extends FormRequest
      */
     public function ensureIsNotRateLimited(): void
     {
-        if (!RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
+        if (! RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
             return;
         }
 
@@ -98,6 +98,6 @@ class LoginRequest extends FormRequest
      */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('user_username')) . '|' . $this->ip());
+        return Str::transliterate(Str::lower($this->string('username')).'|'.$this->ip());
     }
 }

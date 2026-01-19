@@ -6,18 +6,16 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('vik_manage_raid', function (Blueprint $table) {
-            $table->foreignId('raid_id')->constrained('vik_raid', 'raid_id');
-            $table->foreignId('user_id')->constrained('vik_member', 'user_id');
+            $table->unsignedBigInteger('raid_id');
+            $table->unsignedBigInteger('user_id');
 
             $table->primary(['raid_id', 'user_id']);
+            $table->foreign('raid_id')->references('raid_id')->on('vik_raid');
+            $table->foreign('user_id')->references('user_id')->on('vik_member');
         });
-
     }
 
     /**

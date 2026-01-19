@@ -30,12 +30,15 @@ class AppServiceProvider extends ServiceProvider
 
         Gate::define('raid', function (Member $member, $raidId = null) {
             $isAdmin = Admin::where('user_id', $member->user_id)->exists();
-            if ($isAdmin) return true;
+            if ($isAdmin) {
+                return true;
+            }
             if ($raidId) {
                 return ManageRaid::where('raid_id', $raidId)
                     ->where('user_id', $member->user_id)
                     ->exists();
             }
+
             return false;
         });
 

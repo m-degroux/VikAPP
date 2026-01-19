@@ -27,7 +27,7 @@
 
     <main>
         {{-- Hero section affichée au début du formulaire --}}
-        @include('partials.herosection', [
+        @include('partials.hero-section', [
             'pageTitle' => 'VOTRE CLUB',
             'pageSubTitle' => 'gérer votre club au sein de ce hub',
             'imageUrl' => asset('img/heroSection/header.jpg')

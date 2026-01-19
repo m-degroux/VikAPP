@@ -6,13 +6,10 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('vik_type', function (Blueprint $table) {
-            $table->id('type_id')->primary();
+            $table->string('type_id')->primary();
             $table->string('type_name', 50);
         });
     }

@@ -2,20 +2,13 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Race;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Gate;
 
 class StoreRaceRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        $race = $this->route('race');
-        if (!$race instanceof Race) {
-            $race = Race::find($race);
-        }
-        if (!$race) return false;
-        return Gate::allows('update-race', $race);
+        return true;
     }
 
     public function rules(): array

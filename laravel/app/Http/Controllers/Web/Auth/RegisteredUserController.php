@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Web\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Club;
 use App\Models\Member;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
@@ -12,7 +13,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
-use App\Models\Club;
 
 /**
  * Controller responsible for handling new user registration.
@@ -48,7 +48,7 @@ class RegisteredUserController extends Controller
             'mem_email' => ['required', 'string', 'email', 'max:128', 'unique:'.Member::class],
             'user_username' => ['required', 'string', 'max:50', 'unique:'.Member::class],
             'user_password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'club_id' => ['nullable', 'integer', 'exists:vik_club,club_id']
+            'club_id' => ['nullable', 'integer', 'exists:vik_club,club_id'],
         ]);
 
         // Create a new Member record in the database
@@ -61,7 +61,7 @@ class RegisteredUserController extends Controller
             'mem_email' => $request->mem_email,
             'mem_default_licence' => $request->mem_default_licence,
             'user_username' => $request->user_username,
-            'user_password'  => Hash::make($request->user_password), // Securely hash the password
+            'user_password' => Hash::make($request->user_password), // Securely hash the password
             'club_id' => $request->club_id,
         ]);
 
@@ -71,7 +71,7 @@ class RegisteredUserController extends Controller
         // Automatically log in the newly registered user
         Auth::login($user);
 
-        // Redirect to the home page
-        return Redirect::to("/");
+        // Redirect to home for regular members
+        return redirect()->route('welcome');
     }
 }

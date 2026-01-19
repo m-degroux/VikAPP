@@ -6,17 +6,14 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('vik_race', function (Blueprint $table) {
-            $table->id('race_id')->primary();
+            $table->string('race_id')->primary();
 
-            $table->foreignId('raid_id')->constrained('vik_raid', 'raid_id');
-            $table->foreignId('type_id')->constrained('vik_type', 'type_id');
-            $table->foreignId('dif_id')->constrained('vik_difficulty', 'dif_id');
+            $table->unsignedBigInteger('raid_id');
+            $table->string('type_id');
+            $table->string('dif_id');
 
             $table->string('race_name', 50);
             $table->time('race_duration');
@@ -32,8 +29,11 @@ return new class extends Migration
             $table->unsignedSmallInteger('race_max_team');
             $table->unsignedTinyInteger('race_max_part_per_team');
             $table->decimal('race_meal_price', 5, 2)->nullable();
-        });
 
+            $table->foreign('raid_id')->references('raid_id')->on('vik_raid');
+            $table->foreign('type_id')->references('type_id')->on('vik_type');
+            $table->foreign('dif_id')->references('dif_id')->on('vik_difficulty');
+        });
     }
 
     /**

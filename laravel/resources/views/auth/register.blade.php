@@ -61,11 +61,11 @@
                         <div class="flex items-center mt-2 space-x-6">
                             <label class="inline-flex items-center">
                                 <input type="radio" name="is_licencie" value="oui" x-model="isLicencie" class="text-indigo-600 focus:ring-indigo-500">
-                                <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Oui') }}</span>
+                                <span class="ml-2 text-sm text-gray-600">{{ __('Oui') }}</span>
                             </label>
                             <label class="inline-flex items-center">
                                 <input type="radio" name="is_licencie" value="non" x-model="isLicencie" class="text-indigo-600 focus:ring-indigo-500">
-                                <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Non') }}</span>
+                                <span class="ml-2 text-sm text-gray-600">{{ __('Non') }}</span>
                             </label>
                         </div>
 
@@ -73,11 +73,11 @@
                              x-transition:enter="transition ease-out duration-300"
                              x-transition:enter-start="opacity-0 -translate-y-2"
                              x-transition:enter-end="opacity-100 translate-y-0"
-                             class="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                             class="mt-4 p-4 bg-gray-50 rounded-lg">
                             
                             <div class="mb-4">
                                 <x-input-label for="club_id" :value="__('Votre club')" />
-                                <select id="club_id" name="club_id" class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                <select id="club_id" name="club_id" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
                                     @foreach($clubs as $club)
                                         <option value="{{ $club->club_id }}"
                                             {{ (old('club_id') == $club->id) ? 'selected' : '' }}>
@@ -111,7 +111,7 @@
             </div>
 
             <div class="flex items-center justify-end mt-8 border-t pt-4">
-                <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="{{ route('login') }}">
+                <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
                     {{ __('Déjà inscrit ?') }}
                 </a>
                 <x-primary-button class="ms-4">

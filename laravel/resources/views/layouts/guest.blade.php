@@ -17,13 +17,13 @@
 <body class="font-sans text-gray-900 antialiased flex flex-col min-h-screen">
     @include('partials.header')
 
-    <main class="flex-grow flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-0 dark:bg-gray-900" >
+    <main class="flex-grow flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-0" >
         <div>
             <img src="{{ asset('img/logo.png') }}" alt="Logo" class="w-20 h-20" style="margin : 20px;">
         </div>
 
-        <div class="w-full mt-6 px-6 py-4 bg-white dark:bg-gray-800 overflow-hidden sm:rounded-lg">
-            {{ $slot }}
+        <div class="w-full mt-6 px-6 py-4 bg-white overflow-hidden sm:rounded-lg">
+            @yield('content', $slot ?? '')
         </div>
     </main>
 

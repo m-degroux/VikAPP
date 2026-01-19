@@ -50,7 +50,7 @@ class RegisteredUserController extends Controller
             'mem_email' => $request->mem_email,
             'mem_default_licence' => $request->mem_licence,
             'user_username' => $request->user_username,
-            'user_password'  => Hash::make($request->user_password)
+            'user_password' => Hash::make($request->user_password),
         ]);
 
         event(new Registered($user));

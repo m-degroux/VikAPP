@@ -25,7 +25,7 @@ class JoinTeamController extends Controller
 
         return response()->json([
             'message' => 'Association créée avec succès',
-            'data' => $result
+            'data' => $result,
         ], 201);
     }
 
@@ -36,7 +36,7 @@ class JoinTeamController extends Controller
     {
         $deleted = $this->service->leave($teamId, $userId);
 
-        if (!$deleted) {
+        if (! $deleted) {
             return response()->json(['message' => 'Association non trouvée'], 404);
         }
 
@@ -49,6 +49,7 @@ class JoinTeamController extends Controller
     public function showByTeam(int $teamId): JsonResponse
     {
         $members = $this->service->getMembersByTeam($teamId);
+
         return response()->json($members);
     }
 }

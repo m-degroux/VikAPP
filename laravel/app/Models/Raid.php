@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Helpers\DateHelper;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -10,6 +12,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Raid extends Model
 {
+    use HasFactory;
+
     /** @var string The table associated with the model */
     protected $table = 'vik_raid';
 
@@ -35,10 +39,28 @@ class Raid extends Model
         'raid_picture',
         'raid_lat',
         'raid_lng',
-        'club_id'
+        'club_id',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'raid_reg_start_date' => 'datetime',
+            'raid_reg_end_date' => 'datetime',
+            'raid_start_date' => 'datetime',
+            'raid_end_date' => 'datetime',
+            'raid_lat' => 'decimal:8',
+            'raid_lng' => 'decimal:8',
+            'club_id' => 'integer',
+        ];
+    }
+
     /* ---------- Relations ---------- */
+
+    public function club()
+    {
+        return $this->belongsTo(Club::class, 'club_id');
+    }
 
     /**
      * Get all races associated with this raid.
@@ -81,7 +103,7 @@ class Raid extends Model
      */
     public function isOngoing()
     {
-        return $this->races->contains(function($race) {
+        return $this->races->contains(function ($race) {
             return $race->race_start_date <= now() && $race->race_end_date >= now();
         });
     }
@@ -105,18 +127,11 @@ class Raid extends Model
     {
         $nextRace = $this->nextRace();
 
-        if (!$nextRace) {
+        if (! $nextRace) {
             return null;
         }
 
-        return Carbon::now()->diffForHumans(
-            Carbon::parse($nextRace->race_start_date),
-            [
-                'parts' => 2,
-                'short' => true,
-                'syntax' => Carbon::DIFF_ABSOLUTE
-            ]
-        );
+        return DateHelper::diffForHumansShort(Carbon::parse($nextRace->race_start_date));
     }
 
     /**
@@ -125,16 +140,6 @@ class Raid extends Model
     public function racesCount()
     {
         return $this->races->count();
-    }
-
-    /**
-     * Helper method to get the overall minimum age required for the raid.
-     */
-    public function minAge()
-    {
-        return $this->races
-            ->flatMap->ageCategories
-            ->min('age_min');
     }
 
     public function isPast(): bool

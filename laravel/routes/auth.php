@@ -1,13 +1,12 @@
 <?php
 
+use App\Http\Controllers\Auth\ConfirmablePasswordController;
 use App\Http\Controllers\Web\Auth\AuthenticatedSessionController;
-use App\Http\Controllers\Web\Auth\NewPasswordController;
 use App\Http\Controllers\Web\Auth\PasswordController;
-use App\Http\Controllers\Web\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Web\Auth\RegisteredUserController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('guest')->group(function () {
+Route::middleware('guest:web')->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])
         ->name('register');
 
@@ -21,6 +20,11 @@ Route::middleware('guest')->group(function () {
 
 // Routes pour les Membres (Guard web)
 Route::middleware('auth:web')->group(function () {
+    Route::get('confirm-password', [ConfirmablePasswordController::class, 'show'])
+        ->name('password.confirm');
+
+    Route::post('confirm-password', [ConfirmablePasswordController::class, 'store']);
+
     Route::put('password', [PasswordController::class, 'update'])->name('password.update');
 
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])

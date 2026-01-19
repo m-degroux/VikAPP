@@ -15,31 +15,38 @@
             @csrf
 
             <div class="mb-4">
-                <label for="user_username" class="form-label">
+                <label for="username" class="form-label">
                     {{ __('Pseudo') }}
                 </label>
-                <input id="user_username"
+                <input id="username"
                        class="form-input"
                        type="text"
-                       name="user_username"
-                       value="{{ old('user_username') }}"
+                       name="username"
+                       value="{{ old('username') }}"
                        required
                        autofocus
                        autocomplete="username"/>
-                <x-input-error :messages="$errors->get('user_username')" class="mt-2"/>
+                <x-input-error :messages="$errors->get('username')" class="mt-2"/>
             </div>
 
             <div class="mb-6">
-                <label for="user_password" class="form-label">
+                <label for="password" class="form-label">
                     {{ __('Mot de passe') }}
                 </label>
-                <input id="user_password"
+                <input id="password"
                        class="form-input"
                        type="password"
-                       name="user_password"
+                       name="password"
                        required
                        autocomplete="current-password"/>
-                <x-input-error :messages="$errors->get('user_password')" class="mt-2"/>
+                <x-input-error :messages="$errors->get('password')" class="mt-2"/>
+            </div>
+
+            <div class="block mt-4">
+                <label for="remember_me" class="inline-flex items-center">
+                    <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" name="remember">
+                    <span class="ms-2 text-sm text-gray-600">{{ __('Se souvenir de moi') }}</span>
+                </label>
             </div>
 
             <div class="flex items-center justify-center">

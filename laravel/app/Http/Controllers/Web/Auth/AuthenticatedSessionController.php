@@ -34,8 +34,13 @@ class AuthenticatedSessionController extends Controller
         // Regenerate the session ID to prevent session fixation attacks
         $request->session()->regenerate();
 
-        // Redirect the user to the homepage after successful login
-        return Redirect::to('/');
+        // Redirect based on user type
+        if (Auth::guard('admin')->check()) {
+            return redirect()->route('dashboard');
+        }
+
+        // For regular members, redirect to home
+        return redirect()->route('welcome');
     }
 
     /**
@@ -68,6 +73,6 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerateToken();
 
         // Redirect back to the landing page/admin login
-        return redirect('/'); 
+        return redirect('/');
     }
 }

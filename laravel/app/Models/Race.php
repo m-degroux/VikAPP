@@ -2,14 +2,33 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Race extends Model
 {
+    use HasFactory;
+
     protected $table = 'vik_race';
+
     protected $primaryKey = 'race_id';
+
     public $incrementing = false;
+
+    protected $keyType = 'string';
+
     public $timestamps = false;
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($race) {
+            if (empty($race->race_id)) {
+                $race->race_id = \Illuminate\Support\Str::uuid()->toString();
+            }
+        });
+    }
 
     protected $fillable = [
         'race_id',
@@ -27,8 +46,24 @@ class Race extends Model
         'race_min_team',
         'race_max_team',
         'race_max_part_per_team',
-        'race_meal_price'
+        'race_meal_price',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'race_start_date' => 'datetime',
+            'race_end_date' => 'datetime',
+            'race_length' => 'decimal:2',
+            'race_reduction' => 'decimal:2',
+            'race_min_part' => 'integer',
+            'race_max_part' => 'integer',
+            'race_min_team' => 'integer',
+            'race_max_team' => 'integer',
+            'race_max_part_per_team' => 'integer',
+            'race_meal_price' => 'decimal:2',
+        ];
+    }
 
     /* ---------- Relations ---------- */
 

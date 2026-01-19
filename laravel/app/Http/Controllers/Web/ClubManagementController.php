@@ -5,11 +5,11 @@ namespace App\Http\Controllers\Web;
 use App\Http\Controllers\Controller;
 use App\Models\Club;
 use App\Models\Member;
-use App\Models\Raid;
 use App\Models\Race;
+use App\Models\Raid;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Http\Request;
 
 /**
  * Controller handled to manage Club-related operations and statistics.
@@ -24,28 +24,7 @@ class ClubManagementController extends Controller
         // Fetch only active clubs and eager load the manager relationship
         $clubs = Club::with('manager')->where('club_active', '=', true)->get();
 
-        return view('pages.club.index', compact('clubs'));
-    }
-
-    /**
-     * Retrieve race results (team rankings) for a specific race.
-     */
-    public function show(string $id)
-    {
-        try {
-            // Retrieve teams for the race, sorted by time, excluding those who haven't finished (null)
-            // This is essential for establishing the final ranking
-            $results = DB::table('vik_team')
-                ->where('race_id', $id)
-                ->whereNotNull('team_time') // Important for the leaderboard
-                ->orderBy('team_time', 'asc')
-                ->get();
-
-            return response()->json($results);
-        } catch (\Exception $e) {
-            // Return error message in case of failure
-            return response()->json(['error' => $e->getMessage()], 500);
-        }
+        return view('dashboard.clubs.index', compact('clubs'));
     }
 
     /**
@@ -75,12 +54,12 @@ class ClubManagementController extends Controller
         // Count total races associated with those raids
         $races = Race::whereIn('raid_id', $raidIds)->count();
 
-        return view('pages.club.edit', [
-            'club' => $club, 
-            'manager' => $manager, 
+        return view('dashboard.clubs.edit', [
+            'club' => $club,
+            'manager' => $manager,
             'members' => $members,
-            'nbRaids' => $raids, 
-            'nbRaces' => $races
+            'nbRaids' => $raids,
+            'nbRaces' => $races,
         ]);
     }
 
@@ -124,9 +103,9 @@ class ClubManagementController extends Controller
         DB::table('vik_club')
             ->where('club_id', $id)
             ->update([
-                'club_active' => false
+                'club_active' => false,
             ]);
 
-        return redirect()->route('manage.club.index');
+        return redirect()->route('manage.clubs.index');
     }
 }

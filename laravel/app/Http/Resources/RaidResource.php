@@ -12,30 +12,21 @@ class RaidResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'id' => $this->raid_id,
-            'name' => $this->raid_name,
-            'registration' => [
-                'start' => $this->raid_reg_start_date,
-                'end' => $this->raid_reg_end_date,
-            ],
-            'dates' => [
-                'start' => $this->raid_start_date,
-                'end' => $this->raid_end_date,
-            ],
-            'contact' => $this->raid_contact,
-            'website' => $this->raid_website,
-            'location' => [
-                'place' => $this->raid_place,
-                'lat' => $this->raid_lat,
-                'lng' => $this->raid_lng,
-            ],
-            'picture' => $this->raid_picture,
-            'is_ongoing' => $this->isOngoing(),
-            'min_age' => $this->minAge(),
-            'races_count' => $this->racesCount(),
-            'countdown' => $this->timeUntilNextRace(),
-            'races' => RaceResource::collection($this->whenLoaded('races')),
-            'managers' => MemberResource::collection($this->whenLoaded('managers')),
+            'raid_id' => $this->raid_id,
+            'raid_name' => $this->raid_name,
+            'raid_reg_start_date' => $this->raid_reg_start_date,
+            'raid_reg_end_date' => $this->raid_reg_end_date,
+            'raid_start_date' => $this->raid_start_date,
+            'raid_end_date' => $this->raid_end_date,
+            'raid_contact' => $this->raid_contact,
+            'raid_website' => $this->raid_website,
+            'raid_place' => $this->raid_place,
+            'raid_picture' => $this->raid_picture,
+            'raid_lat' => $this->raid_lat,
+            'raid_lng' => $this->raid_lng,
+            'club_id' => $this->club_id,
+            'races' => $this->whenLoaded('races'),
+            'club' => $this->whenLoaded('club'),
         ];
     }
 }

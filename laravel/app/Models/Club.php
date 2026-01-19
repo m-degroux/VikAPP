@@ -2,13 +2,19 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Club extends Model
 {
+    use HasFactory;
+
     protected $table = 'vik_club';
+
     protected $primaryKey = 'club_id';
+
     public $incrementing = false;
+
     public $timestamps = false;
 
     protected $fillable = [
@@ -16,20 +22,30 @@ class Club extends Model
         'user_id',
         'club_name',
         'club_address',
-        'club_active'
+        'club_active',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'club_active' => 'boolean',
+        ];
+    }
 
     /* ---------- Relations ---------- */
 
-    // FK vik_club.user_id → vik_member.user_id
     public function manager()
     {
         return $this->belongsTo(Member::class, 'user_id');
     }
 
-    // FK vik_member.club_id
     public function members()
     {
         return $this->hasMany(Member::class, 'club_id');
+    }
+
+    public function raids()
+    {
+        return $this->hasMany(Raid::class, 'club_id');
     }
 }

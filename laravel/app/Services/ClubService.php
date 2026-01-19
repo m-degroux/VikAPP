@@ -26,8 +26,20 @@ class ClubService
         $club = Club::find($id);
         if ($club) {
             $club->update($data);
+
             return $club;
         }
+
         return null;
+    }
+
+    public function deleteClub($id): bool
+    {
+        $club = Club::find($id);
+        if ($club) {
+            return (bool) $club->delete();
+        }
+
+        return false;
     }
 }
